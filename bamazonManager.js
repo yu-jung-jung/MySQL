@@ -7,7 +7,7 @@ var connection = mysql.createConnection({
   host: "localhost",
   port: 3306, 
   user: "root",
-  password: "I@mgo0dthnx^^",
+  password: "1234",
   database: "bamazon"
 });
 
@@ -76,7 +76,9 @@ inquirer.prompt([{
 		    	console.log("Price             :" + res[i].price);
 		    	console.log("Available Quantity:" + res[i].stock_quantity);
 		    	console.log("====================================")
-		    }   
+		    } 
+
+		    viewProduct();  
 
   		});		
 
@@ -119,6 +121,8 @@ inquirer.prompt([{
 					})		
 		})
 
+		viewProduct();
+
 	};
 
 	//should allow the manager to add a completely new product to the store.
@@ -126,30 +130,53 @@ inquirer.prompt([{
 
 		inquirer.prompt([{
 
-			name: "newItemName"
-			type: "input"
+			name: "newItemName",
+			type: "input",
 			message: "Type the name of the new product"
 		},
 		{
 
-			name: "newItem"
-			type: "input"
+			name: "newItemCategory",
+			type: "input",
 			message: "Type the name of the new product"
 
 		},
 		{
-			name: "newItemName"
-			type: "input"
-			message: "Type the name of the new product"
+			name: "newItemPrice",
+			type: "input",
+			message: "Type the name of the new product",
+			validate: function(userValue){
+				if(!isNaN(userValue)){
+					return true;
+				}else
+					return false;
+			}
 
 		},
 		{
-			name: "newItemName"
-			type: "input"
-			message: "Type the name of the new product"
+			name: "newItemQuantity",
+			type: "input",
+			message: "Type the name of the new product",
+			validate: function(userValue){
+				if(!isNaN(userValue)){
+					return true;
+				}else
 
-		},
-		])
+				return false;
+			}
+		}
+		]).then(function(newItem){
+
+			var name = newItem.newItemName
+			var category = newItem.newItemCategory
+			var price = newItem.newItemPrice
+			var quantity = newItem.newItemQuantity;
+
+			var add = function(){
+
+				connection.query("INSERT INTO products ")
+			}
+		})
 
 
 

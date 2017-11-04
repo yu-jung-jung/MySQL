@@ -1,14 +1,14 @@
 //npm
 var inquirer = require('inquirer');
 var mysql = require("mysql");
-var Table = require('cli-table');
+
 
 //mysql connection
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306, 
   user: "root",
-  password: "I@mgo0dthnx^^",
+  password: "1234",
   database: "bamazon"
 });
 
@@ -31,6 +31,7 @@ function displayDB() {
     	console.log("Available Quantity:" + res[i].stock_quantity);
     	console.log("====================================")
     }   
+    console.log(res);
       prompt(); 
   });
 
