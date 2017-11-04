@@ -11,18 +11,16 @@ var connection = mysql.createConnection({
   database: "bamazon"
 });
 
-
 // Question
-
 inquirer.prompt([{
 	name: "first",
 	type: "rawlist",
 	message: "Select the task below: ",
 	choices:["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
 
-	}]). then(function(answer){
+	}]). then(function(answers){
 
-	var task = answer.first;
+	var task = answers.first;
 
 		if(task === "View Products for Sale"){
 			viewProduct();
@@ -44,7 +42,7 @@ inquirer.prompt([{
 
 	});
 
-	// should list every available item: the item IDs, names, prices, and quantities.
+// should list every available item: the item IDs, names, prices, and quantities.
 	function viewProduct(){
 		connection.query("SELECT * FROM products", function(err, res) {
 		    if (err) 
@@ -53,7 +51,6 @@ inquirer.prompt([{
 
 		    	console.log("ID                :" + res[i].item_id);
 		    	console.log("Product name      :" + res[i].product_name);
-		    	console.log("Category          :" + res[i].department_name);
 		    	console.log("Price             :" + res[i].price);
 		    	console.log("Available Quantity:" + res[i].stock_quantity);
 		    	console.log("====================================")
@@ -63,29 +60,7 @@ inquirer.prompt([{
 
 	};
 
-	// should list all items with an inventory count lower than five.
-	function viewInventory(){
-		connection.query("SELECT * FROM products WHERE stock_quantity < 5", function(err, res) {
-		    if (err) 
-
-		    for(var i = 0; i < res.length; i++){
-
-		    	console.log("ID                :" + res[i].item_id);
-		    	console.log("Product name      :" + res[i].product_name);
-		    	console.log("Category          :" + res[i].department_name);
-		    	console.log("Price             :" + res[i].price);
-		    	console.log("Available Quantity:" + res[i].stock_quantity);
-		    	console.log("====================================")
-		    } 
-
-		    viewProduct();  
-
-  		});		
-
-
-	};
-
-	//app should display a prompt that will let the manager "add more" of any item currently in the store.
+//app should display a prompt that will let the manager "add more" of any item currently in the store.
 	function addInventory(){
 
 		inquirer.prompt([{
@@ -117,7 +92,14 @@ inquirer.prompt([{
 		
 				var query = connection.query(
 					"UPDATE products SET stock_quantity" + answer.addInventoryQuantity +" WHERE product_name" +answer.addInventory, function(err,res){
-						console.log("Upadate complete!")
+						if(err){
+							console.log(err)
+
+						}else{
+
+						console.log("Upadate complete!")							
+						}
+
 					})		
 		})
 
@@ -125,20 +107,41 @@ inquirer.prompt([{
 
 	};
 
-	//should allow the manager to add a completely new product to the store.
-	function addProduct(){
+// should list all items with an inventory count lower than five.
+	function viewInventory(){
+		connection.query("SELECT * FROM products WHERE stock_quantity < 5", function(err, res) {
+		    if (err) {
+		    	console.log(err)
+		    }else{
 
+			    for(var i = 0; i < res.length; i++){
+
+			    	console.log("ID                :" + res[i].item_id);
+			    	console.log("Product name      :" + res[i].product_name);
+			    	console.log("Category          :" + res[i].department_name);
+			    	console.log("Price             :" + res[i].price);
+			    	console.log("Available Quantity:" + res[i].stock_quantity);
+			    	console.log("====================================")
+			    } 
+			}
+
+		    viewProduct();  
+  		});		
+
+
+	};
+
+//should allow the manager to add a completely new product to the store.
+	function addProduct() {
 		inquirer.prompt([{
-
 			name: "newItemName",
 			type: "input",
 			message: "Type the name of the new product"
 		},
 		{
-
 			name: "newItemCategory",
 			type: "input",
-			message: "Type the name of the new product"
+			message: "Type the category of the new product"
 
 		},
 		{
@@ -164,39 +167,31 @@ inquirer.prompt([{
 
 				return false;
 			}
+
 		}
 		]).then(function(newItem){
+			// var name = newItem.newItemName
+			// var category = newItem.newItemCategory
+			// var price = newItem.newItemPrice
+			// var quantity = newItem.newItemQuantity
 
-			var name = newItem.newItemName
-			var category = newItem.newItemCategory
-			var price = newItem.newItemPrice
-			var quantity = newItem.newItemQuantity;
+			function add(){
 
-			var add = function(){
+				connection.query("INSERT INTO products SET ?",
+				{
+					product_name: newItem.newItemName,
+					department_name: newItem.newItemCategory,
+					price: price: newItem.newItemPrice,
+					stock_quantity: newItem.newItemQuantity
 
-				connection.query("INSERT INTO products ")
+				}, 
+				
+				function(err,res){
+
+					console.log("Product Has Been added!")
+				})
 			}
 		})
+	}
 
 
-
-
-
-		 console.log("Inserting a new product...\n");
-  var query = connection.query(
-    "INSERT INTO products SET ?",
-    {
-      flavor: "Rocky Road",
-      price: 3.0,
-      quantity: 50
-    },
-    function(err, res) {
-      console.log(res.affectedRows + " product inserted!\n");
-      // Call updateProduct AFTER the INSERT completes
-      updateProduct();
-    }
-  );
-
-
-
-	};
