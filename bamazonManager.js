@@ -14,7 +14,7 @@ var connection = mysql.createConnection({
 // Question
 inquirer.prompt([{
 	name: "first",
-	type: "rawlist",
+	type: "list",
 	message: "Select the task below: ",
 	choices:["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
 
@@ -45,7 +45,11 @@ inquirer.prompt([{
 // should list every available item: the item IDs, names, prices, and quantities.
 	function viewProduct(){
 		connection.query("SELECT * FROM products", function(err, res) {
-		    if (err) 
+
+		    if (err) {
+		    	console.log(err)
+
+		    }else{
 
 		    for(var i = 0; i < res.length; i++){
 
@@ -54,9 +58,14 @@ inquirer.prompt([{
 		    	console.log("Price             :" + res[i].price);
 		    	console.log("Available Quantity:" + res[i].stock_quantity);
 		    	console.log("====================================")
-		    }   
+		    }  
+
+		     
+		    } 
 
   		});		
+
+  		connection.end()
 
 	};
 
@@ -64,9 +73,9 @@ inquirer.prompt([{
 	function addInventory(){
 
 		inquirer.prompt([{
-			name: "addInventory"
-			type: "rawlist"
-			message "Select the item you want to add more"
+			name: "addInventory",
+			type: "list",
+			message: "Select the item you want to add more",
 			choices: ["choo choo train",
 					"fluffy teddy bear",
 					"padding vest",
@@ -77,9 +86,9 @@ inquirer.prompt([{
 					"vegan bacon"]
 				},
 			{
-				name: "addInventoryQuantity"
-				type: "Input"
-				message:"Type the quantity of the products you wish to add"
+				name: "addInventoryQuantity",
+				type: "Input",
+				message: "Type the quantity of the products you wish to add",
 				validation: function(userValue){
 					if(!isNaN(userValue)){
 						return true;
@@ -89,9 +98,23 @@ inquirer.prompt([{
 				}
 			}
 		]). then(function(answer){
+
 		
 				var query = connection.query(
-					"UPDATE products SET stock_quantity" + answer.addInventoryQuantity +" WHERE product_name" +answer.addInventory, function(err,res){
+					"UPDATE products SET ? WHERE ?", 
+					[ 
+						{
+							stock_quantity: answer.addInventoryQuantity
+
+						},
+						{
+							product_name: answer.addInventory
+
+						}
+
+					],
+					
+					 function(err,res){
 						if(err){
 							console.log(err)
 
@@ -100,10 +123,11 @@ inquirer.prompt([{
 						console.log("Upadate complete!")							
 						}
 
-					})		
-		})
+					})	
+					connection.end();	
+			})
 
-		viewProduct();
+		
 
 	};
 
@@ -125,9 +149,10 @@ inquirer.prompt([{
 			    } 
 			}
 
-		    viewProduct();  
-  		});		
+		    // viewProduct();
 
+  		});		
+		connection.end();
 
 	};
 
@@ -147,7 +172,7 @@ inquirer.prompt([{
 		{
 			name: "newItemPrice",
 			type: "input",
-			message: "Type the name of the new product",
+			message: "Type the price of the new product",
 			validate: function(userValue){
 				if(!isNaN(userValue)){
 					return true;
@@ -159,7 +184,7 @@ inquirer.prompt([{
 		{
 			name: "newItemQuantity",
 			type: "input",
-			message: "Type the name of the new product",
+			message: "Type the quantity of the new product",
 			validate: function(userValue){
 				if(!isNaN(userValue)){
 					return true;
@@ -175,22 +200,29 @@ inquirer.prompt([{
 			// var price = newItem.newItemPrice
 			// var quantity = newItem.newItemQuantity
 
+			add();
+
 			function add(){
 
 				connection.query("INSERT INTO products SET ?",
 				{
 					product_name: newItem.newItemName,
 					department_name: newItem.newItemCategory,
-					price: price: newItem.newItemPrice,
+					price: newItem.newItemPrice,
 					stock_quantity: newItem.newItemQuantity
 
 				}, 
 				
 				function(err,res){
 
+					if(err){
+						console.log(err)
+					}else{
 					console.log("Product Has Been added!")
+					}
 				})
 			}
+			connection.end()
 		})
 	}
 

@@ -72,17 +72,19 @@ function prompt(){
 
 		]).then(function(answers){
 
-			purchase();
+			purchase(answers);
+
+
 
 		})
 }
 
-function purchase() {
+function purchase(answers) {
 	connection.query("SELECT * FROM products WHERE item_id =" +answers.userID, function(err,res){
 		if(err){
 			console.log(err)
 		}else{
-			if(answers.userQuantity <= res[i].stock_quantity){
+			if(answers.userQuantity <= res[0].stock_quantity){
 
 				connection.query("UPDATE products SET stock_quantity = stock_quantity - " + answers.userQuantity+" WHERE item_id = "+ answers.userID, function(err,res){
 					if(err){
@@ -95,8 +97,9 @@ function purchase() {
 				console.log("We apologies. Insufficient quantity of that item in stock")
 			}
 		}
+			connection.end();
 	})
 
-	connection.end();
+
 }
 
